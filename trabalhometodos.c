@@ -23,6 +23,7 @@ int CreateLogin(Hash* t, const char* nome,char *senha);
 int Remove_Login(Hash* tabela, const char* nome);
 int AprovarLogin(Hash* tabela, const char* nome);
 void Free_Hash(Hash* tabela);
+Usuario* BuscaHash(Hash* tabela, const char* nome);
 
 // Cria a tabela hash
 Hash* Criar_Hash() {
@@ -169,4 +170,26 @@ void Free_Hash(Hash* tabela) {
 
     free(tabela->p);
     free(tabela);
+} 
+
+// Busca um login na tabela hash
+Usuario* BuscaHash(Hash* tabela, const char* nome) {
+    if (tabela == NULL || nome == NULL) {
+        return NULL; // tabela ou nome inválido
+    }
+
+    // calcula posição na tabela
+    int chave = TransformaCharacterEmInteiro(nome);
+    int pos = PosSenha(chave, tabela->capacidade);
+
+    // percorre lista encadeada na posição
+    Usuario* atual = tabela->p[pos];
+    while (atual != NULL) {
+        if (strcmp(atual->login, nome) == 0) {
+            return atual; // encontrado
+        }
+        atual = atual->prox;
+    }
+
+    return NULL; // não encontrado
 }
