@@ -1,0 +1,14 @@
+trabalho de estrutura de dados 
+1- cadastro 
+	1.1- aparecer senha "Hash" 
+	1.2- aprovar login 
+2-Imprimir 
+3-remover usuário 
+
+Funções obrigatórias 
+1- Criahash()     --v
+2- InsereHash()   --v
+3- BuscaHash()	  A fazer!
+4- RemoveHash()   --v
+5- LiberaHash()   A fazer!
+6- ImprimiHash()  --v
