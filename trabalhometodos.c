@@ -4,7 +4,7 @@
 
 typedef struct usuario {
     char login[30]; 
-    char senha;      
+    int senha;      
     struct usuario* prox; // ponteiro para o próximo (encadeamento)
 } Usuario;
 
@@ -14,16 +14,16 @@ typedef struct tabela {
     Usuario **p; // vetor de ponteiros para listas de usuários
 } Hash;
 
+// Protótipos
 Hash* Criar_Hash();
 void Print_Hash(Hash *h);
-int TransformaCharacterEmInteiro(const char *a);
 int HashSenha(const char *senha);
 int PosSenha(int chave, int size);
-int CreateLogin(Hash* t, const char* nome,char *senha);
-int Remove_Login(Hash* tabela, const char* nome);
-int AprovarLogin(Hash* tabela, const char* nome);
+int CreateLogin(Hash* t, const char* nome, const char* senha);
+int RemoveHash(Hash* tabela, const char* nome, int senhaHash);
+int AprovarLogin(Hash* tabela, const char* nome, int senhaHash);
 void Free_Hash(Hash* tabela);
-Usuario* BuscaHash(Hash* tabela, const char* nome);
+Usuario* BuscaHash(Hash* tabela, const char* nome, int senhaHash);
 
 // Cria a tabela hash
 Hash* Criar_Hash() {
@@ -37,27 +37,24 @@ Hash* Criar_Hash() {
 }
 
 // Insere login na tabela (com encadeamento)
-int CreateLogin(Hash* t, const char* nome, char *senha) {
-    int chave = TransformaCharacterEmInteiro(senha);
-    int pos = PosSenha(chave, t->capacidade);
+int CreateLogin(Hash* t, const char* nome, const char* senha) {
+    int senhaHash = HashSenha(senha);              
+    int pos = PosSenha(senhaHash, t->capacidade);  
 
-    // cria novo usuário
     Usuario* no = malloc(sizeof(Usuario));
     strcpy(no->login, nome);
-    no->senha = HashSenha(senha);
+    no->senha = senhaHash;   
     no->prox = NULL;
 
-    // se posição está vazia, insere direto
     if (t->p[pos] == NULL) {
         t->p[pos] = no;
         t->qtd++;
         printf("Login %s cadastrado com senha hash %d\n", nome, no->senha);
         return 1;
     } else {
-        // encadeamento: percorre lista
         Usuario* atual = t->p[pos];
         while (atual->prox != NULL) {
-            if (strcmp(atual->login, nome) == 0) {
+            if (strcmp(atual->login, nome) == 0 && atual->senha == senhaHash) {
                 printf("Login %s já existe.\n", nome);
                 free(no);
                 return 0;
@@ -71,7 +68,7 @@ int CreateLogin(Hash* t, const char* nome, char *senha) {
     }
 }
 
-// Imprime a tabela (mostra listas encadeadas)
+// Imprime a tabela
 void Print_Hash(Hash* t) {
     printf("Tabela Hash (qtd = %d, capacidade = %d)\n", t->qtd, t->capacidade);
     for (int i = 0; i < t->capacidade; i++) {
@@ -89,20 +86,6 @@ void Print_Hash(Hash* t) {
     }
 }
 
-// Função de hash para string -> inteiro
-int TransformaCharacterEmInteiro(const char *a) {
-    int val = 0;
-    for (int i = 0; a[i] != '\0'; i++) {
-        val = 31 * val + a[i];
-    }
-    return val;
-}
-
-// Reduz o valor para caber na tabela
-int PosSenha(int chave, int size) {
-    return chave % size;
-}
-
 // Hash direto da senha
 int HashSenha(const char *senha) {
     unsigned long hash = 0;
@@ -113,16 +96,22 @@ int HashSenha(const char *senha) {
     return (int)(hash & 0x7FFFFFFF);
 }
 
-// Remove login da tabela (percorrendo lista encadeada)
-int Remove_Login(Hash* tabela, const char* nome) {
-    int chave = TransformaCharacterEmInteiro(nome);
-    int pos = PosSenha(chave, tabela->capacidade);
+// Reduz o valor para caber na tabela
+int PosSenha(int chave, int size) {
+    return chave % size;
+}
+
+// Remove login da tabela
+int RemoveHash(Hash* tabela, const char* nome, int senhaHash) {
+    if (tabela == NULL) return 0;
+
+    int pos = PosSenha(senhaHash, tabela->capacidade);
 
     Usuario* atual = tabela->p[pos];
     Usuario* anterior = NULL;
 
     while (atual != NULL) {
-        if (strcmp(atual->login, nome) == 0) {
+        if (strcmp(atual->login, nome) == 0 && atual->senha == senhaHash) {
             if (anterior == NULL) {
                 tabela->p[pos] = atual->prox;
             } else {
@@ -130,24 +119,24 @@ int Remove_Login(Hash* tabela, const char* nome) {
             }
             free(atual);
             tabela->qtd--;
-            printf("Login %s removido.\n", nome);
+            printf("Login %s removido com sucesso.\n", nome);
             return 1;
         }
         anterior = atual;
         atual = atual->prox;
     }
-    printf("Login %s não encontrado.\n", nome);
+
+    printf("Login %s com a senha hash %d não encontrado.\n", nome, senhaHash);
     return 0;
 }
 
-// Aprovar login (verifica se já existe na lista)
-int AprovarLogin(Hash* tabela, const char* nome) {
-    int chave = TransformaCharacterEmInteiro(nome);
-    int pos = PosSenha(chave, tabela->capacidade);
+// Aprovar login (verifica se já existe)
+int AprovarLogin(Hash* tabela, const char* nome, int senhaHash) {
+    int pos = PosSenha(senhaHash, tabela->capacidade);
 
     Usuario* atual = tabela->p[pos];
     while (atual != NULL) {
-        if (strcmp(atual->login, nome) == 0) {
+        if (strcmp(atual->login, nome) == 0 && atual->senha == senhaHash) {
             return 0; // já existe
         }
         atual = atual->prox;
@@ -155,9 +144,9 @@ int AprovarLogin(Hash* tabela, const char* nome) {
     return 1; // não existe, pode aprovar
 }
 
-
+// Libera memória da tabela
 void Free_Hash(Hash* tabela) {
-    if (!tabela) return;    // Verifica se a tabela existe
+    if (!tabela) return;    
 
     for (int i = 0; i < tabela->capacidade; i++) {
         Usuario* atual = tabela->p[i];
@@ -172,24 +161,18 @@ void Free_Hash(Hash* tabela) {
     free(tabela);
 } 
 
-// Busca um login na tabela hash
-Usuario* BuscaHash(Hash* tabela, const char* nome) {
-    if (tabela == NULL || nome == NULL) {
-        return NULL; // tabela ou nome inválido
-    }
+// Busca login na tabela
+Usuario* BuscaHash(Hash* tabela, const char* nome, int senhaHash) {
+    if (tabela == NULL) return NULL;
 
-    // calcula posição na tabela
-    int chave = TransformaCharacterEmInteiro(nome);
-    int pos = PosSenha(chave, tabela->capacidade);
+    int pos = PosSenha(senhaHash, tabela->capacidade);
 
-    // percorre lista encadeada na posição
     Usuario* atual = tabela->p[pos];
     while (atual != NULL) {
-        if (strcmp(atual->login, nome) == 0) {
-            return atual; // encontrado
+        if (strcmp(atual->login, nome) == 0 && atual->senha == senhaHash) {
+            return atual; 
         }
         atual = atual->prox;
     }
-
-    return NULL; // não encontrado
+    return NULL; 
 }
