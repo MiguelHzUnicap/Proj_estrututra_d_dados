@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "trabalhometodos.c"  // ideal seria usar trabalhometodos.h
+#include "trabalhometodos.h"  // ideal seria usar trabalhometodos.h
 
 int main() {
     Hash* tabela = Criar_Hash();
@@ -35,21 +35,33 @@ int main() {
                 break;
 
             case 2: {
+                getchar();
+
                 printf("Digite o login para buscar: ");
                 scanf("%s", nome);
-                Usuario* u = BuscaHash(tabela, nome,senhaHash);
+
+                printf("Digite a senha para buscar: ");
+                scanf("%s", senha);
+
+                // Calcula o hash da senha informada
+                int senhaHash = HashSenha(senha);
+
+                // Busca pelo login + senha hash
+                Usuario* u = BuscaHash(tabela, nome, senhaHash);
+
                 if (u != NULL) {
                     printf("Login encontrado: %s | Senha hash: %d\n", u->login, u->senha);
                 } else {
-                    printf("Login %s não encontrado.\n", nome);
+                    printf("Login %s com a senha informada não encontrado.\n", nome);
                 }
                 break;
-            }
+}
+
 
             case 3:
                 printf("Digite o login para remover: \n");
                 scanf("%s", nome);
-                printf("Digite sua senha: \n"); 
+                printf("Digite sua senha: \n");
                 scanf("%s",senha);
                 RemoveHash(tabela, nome,HashSenha(senha));
                 break;
