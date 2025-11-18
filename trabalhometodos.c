@@ -3,14 +3,14 @@
 #include <string.h>
 
 typedef struct usuario {
-    char login[30]; 
-    int senha;      
+    char login[30];
+    int senha;
     struct usuario* prox; // ponteiro para o próximo (encadeamento)
 } Usuario;
 
 typedef struct tabela {
-    int capacidade;   
-    int qtd;   
+    int capacidade;
+    int qtd;
     Usuario **p; // vetor de ponteiros para listas de usuários
 } Hash;
 
@@ -38,12 +38,12 @@ Hash* Criar_Hash() {
 
 // Insere login na tabela (com encadeamento)
 int CreateLogin(Hash* t, const char* nome, const char* senha) {
-    int senhaHash = HashSenha(senha);              
-    int pos = PosSenha(senhaHash, t->capacidade);  
+    int senhaHash = HashSenha(senha);
+    int pos = PosSenha(senhaHash, t->capacidade);
 
     Usuario* no = malloc(sizeof(Usuario));
     strcpy(no->login, nome);
-    no->senha = senhaHash;   
+    no->senha = senhaHash;
     no->prox = NULL;
 
     if (t->p[pos] == NULL) {
@@ -146,7 +146,7 @@ int AprovarLogin(Hash* tabela, const char* nome, int senhaHash) {
 
 // Libera memória da tabela
 void Free_Hash(Hash* tabela) {
-    if (!tabela) return;    
+    if (!tabela) return;
 
     for (int i = 0; i < tabela->capacidade; i++) {
         Usuario* atual = tabela->p[i];
@@ -159,10 +159,10 @@ void Free_Hash(Hash* tabela) {
 
     free(tabela->p);
     free(tabela);
-} 
+}
 
 // Busca login na tabela
-Usuario* BuscaHash(Hash* tabela, const char* nome, int senhaHash) {
+/*Usuario* BuscaHash(Hash* tabela, const char* nome, int senhaHash) {
     if (tabela == NULL) return NULL;
 
     int pos = PosSenha(senhaHash, tabela->capacidade);
@@ -170,9 +170,28 @@ Usuario* BuscaHash(Hash* tabela, const char* nome, int senhaHash) {
     Usuario* atual = tabela->p[pos];
     while (atual != NULL) {
         if (strcmp(atual->login, nome) == 0 && atual->senha == senhaHash) {
-            return atual; 
+            return atual;
         }
         atual = atual->prox;
     }
-    return NULL; 
+    return NULL;
+}*/
+
+// Busca login na tabela usando nome e senha hash
+Usuario* BuscaHash(Hash* tabela, const char* nome, int senhaHash) {
+    if (tabela == NULL) return NULL;
+
+    // Calcula posição pelo hash da senha
+    int pos = PosSenha(senhaHash, tabela->capacidade);
+
+    Usuario* atual = tabela->p[pos];
+    while (atual != NULL) {
+        // Verifica se login e senha hash coincidem
+        if (strcmp(atual->login, nome) == 0 && atual->senha == senhaHash) {
+            return atual;
+        }
+        atual = atual->prox;
+    }
+    return NULL; // não encontrado
 }
+
