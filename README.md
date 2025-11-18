@@ -1,5 +1,3 @@
-# Proj_estrututra_d_dados
-
 #  Sistema de Login com Tabela Hash
 
 Este projeto implementa um sistema simples de gerenciamento de logins utilizando **tabela hash com encadeamento** em linguagem C.  
@@ -32,17 +30,6 @@ O programa permite:
 ##  Como Compilar
 
 No terminal, dentro da pasta do projeto, execute:
+
 ```bash
-"gcc main.c -o programa"
-
-## Exemplo de execução
-
-===== MENU =====
-1 - Cadastrar login
-2 - Imprimir tabela
-3 - Remover login
-0 - Sair
-Escolha: 1
-Digite o login: miguel
-Digite a senha: 1234
-Login miguel cadastrado com senha hash 12345678
+gcc main.c -o programa
