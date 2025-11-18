@@ -46,6 +46,3 @@ Escolha: 1
 Digite o login: miguel
 Digite a senha: 1234
 Login miguel cadastrado com senha hash 12345678
-
-```bash
-gcc main.c -o programa
