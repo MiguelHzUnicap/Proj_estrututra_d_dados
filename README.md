@@ -3,12 +3,46 @@
 #  Sistema de Login com Tabela Hash
 
 Este projeto implementa um sistema simples de gerenciamento de logins utilizando **tabela hash com encadeamento** em linguagem C.  
+
 O programa permite:
 
--  Cadastrar novos logins com senha (armazenada como hash)  
--  Imprimir toda a tabela hash  
--  Remover logins existentes  
--  Encerrar o programa  
+O programa apresenta um menu interativo com as seguintes opções:
+
+Cadastrar login
+
+Solicita um nome de usuário e uma senha.
+
+Verifica se o login já existe na tabela.
+
+Caso não exista, insere o novo login.
+
+Buscar login
+
+Solicita o nome de usuário.
+
+Procura na tabela e exibe o login e o hash da senha, se encontrado.
+
+Remover login
+
+Solicita o nome de usuário e a senha.
+
+Remove o login correspondente da tabela, caso exista.
+
+Imprimir tabela
+
+Exibe todos os logins armazenados na tabela hash.
+
+Liberar tabela
+
+Libera toda a memória alocada para a tabela hash.
+
+Define o ponteiro da tabela como NULL para evitar uso indevido.
+
+Sair
+
+Encerra o programa.
+
+Antes de finalizar, garante que a memória da tabela seja liberada.
 
 ---
 
